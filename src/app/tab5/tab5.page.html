@@ -1,0 +1,18 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Conexión a internet</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Conexión</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-button expand="full" (click)="checkNetworkStatus()"
+    >Revisar Red</ion-button
+  >
+  <p>{{mensaje}}</p>
+</ion-content>

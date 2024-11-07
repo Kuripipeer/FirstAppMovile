@@ -1,17 +1,27 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 3
+      Ionic Storage Ejemplo
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-item>
+    <ion-label position="floating">Nombre</ion-label>
+    <ion-input [(ngModel)]="nombre"></ion-input>
+    <ion-label position="floating">Edad</ion-label>
+    <ion-input [(ngModel)]="edad"></ion-input>
+    <ion-label position="floating">Ciudad</ion-label>
+    <ion-input [(ngModel)]="ciudad"></ion-input>
+  </ion-item>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <ion-button expand="full" (click)="save()">Guardar Nombre</ion-button>
+  <ion-button expand="full" (click)="load()">Cargar Nombre</ion-button>
+
+  <p *ngIf="nombre && edad && ciudad">
+    <br>Nombre guardado: {{nombre}}
+    <br>Edad guardada: {{edad}}
+    <br>Ciudad guardada: {{ciudad}}
+  </p>
 </ion-content>

@@ -4,17 +4,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Tab3Page } from './tab3.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
-
 import { Tab3PageRoutingModule } from './tab3-routing.module';
+
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 @NgModule({
   imports: [
-    IonicModule,
+    IonicModule.forRoot(),
     CommonModule,
     FormsModule,
     ExploreContainerComponentModule,
-    Tab3PageRoutingModule
+    Tab3PageRoutingModule,
+    IonicStorageModule.forRoot()
   ],
-  declarations: [Tab3Page]
+  declarations: [Tab3Page],
+  providers: [],
+  bootstrap: [Tab3Page]
 })
 export class Tab3PageModule {}

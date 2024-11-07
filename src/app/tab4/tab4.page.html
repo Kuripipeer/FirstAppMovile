@@ -1,0 +1,23 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Linterna
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <ion-icon *ngIf="on_off" name="flash-outline" aria-label="Linterna encendida"></ion-icon>
+        <ion-icon *ngIf="!on_off" name="flash-off-outline" ></ion-icon>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <ion-toggle color="success" (ionChange)="Control()"></ion-toggle>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

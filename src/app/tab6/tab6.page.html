@@ -1,0 +1,121 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Formulario de registro</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div id="container">
+    <form #taskForm="ngForm">
+      <ion-item>
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input
+          type="text"
+          name="nombre"
+          [(ngModel)]="nombre"
+          errorText="Campo requerido"
+          required
+          #nombreInput="ngModel"
+          pattern="[a-zA-Z\s]+"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Edad</ion-label>
+        <ion-input
+          type="number"
+          errorText="Invalid email"
+          name="edad"
+          [(ngModel)]="edad"
+          min="0"
+          errorText="Campo requerido"
+          required
+          #edadInput="ngModel"
+          max="200"
+        ></ion-input>
+      </ion-item>
+      <ion-list>
+        <ion-item>
+          <ion-label position="floating">Género</ion-label>
+          <ion-select
+            label=""
+            placeholder=""
+            [(ngModel)]="genero"
+            name="genero"
+            required
+            #generoInput="ngModel"
+          >
+            <ion-select-option value="masculino">Masculino</ion-select-option>
+            <ion-select-option value="femenino">Femenino</ion-select-option>
+            <ion-select-option value="otro"
+              >Prefiero no decirlo</ion-select-option
+            >
+          </ion-select>
+        </ion-item>
+      </ion-list>
+      <ion-item>
+        <ion-label position="floating">Ciudad</ion-label>
+        <ion-input
+          type="text"
+          name="ciudad"
+          [(ngModel)]="ciudad"
+          errorText="Campo requerido"
+          required
+          #ciudadInput="ngModel"
+          pattern="[a-zA-Z\s]+"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Fecha de nacimiento</ion-label>
+        <ion-input
+          type="date"
+          name="fechaN"
+          [(ngModel)]="fechaN"
+          errorText="Campo requerido"
+          required
+          #fechaInput="ngModel"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          type="email"
+          fill="solid"
+          label="Correo"
+          labelPlacement="floating"
+          helperText="Enter a valid email"
+          errorText="Invalid email"
+          [(ngModel)]="correo"
+          name="correo"
+          required
+          pattern="^[^@]+@[^@]+\.[a-zA-Z]{2,}$"
+          #correoInput="ngModel"
+        ></ion-input>
+      </ion-item>
+      <ion-button
+        type="submit"
+        expand="block"
+        [disabled]="taskForm.invalid"
+        (click)="addUser()"
+        >Agregar</ion-button
+      >
+    </form>
+  </div>
+  <ion-button (click)="mostrarDatos()" expand="block"
+    >Mostrar Datos Guardados</ion-button
+  >
+
+  <div *ngIf="datosGuardados.length > 0">
+    <ion-card *ngFor="let dato of datosGuardados">
+      <ion-card-header>
+        <ion-card-title>Datos Guardados</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Nombre:</strong> {{ dato.nombre }}</p>
+        <p><strong>Edad:</strong> {{ dato.edad }}</p>
+        <p><strong>Género:</strong> {{ dato.genero }}</p>
+        <p><strong>Ciudad:</strong> {{ dato.ciudad }}</p>
+        <p><strong>Fecha de Nacimiento:</strong> {{ dato.fechaN }}</p>
+        <p><strong>Correo:</strong> {{ dato.correo }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

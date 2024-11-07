@@ -1,5 +1,7 @@
 {
   "name": "FirstAppMovile",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }
