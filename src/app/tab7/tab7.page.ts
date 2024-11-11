@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
-import { PushNotifications } from '@capacitor/push-notifications';
-import { LocalNotifications } from '@capacitor/local-notifications';
+// import { PushNotifications } from '@capacitor/push-notifications';
+import {
+  LocalNotifications,
+  ScheduleOptions,
+} from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-tab7',
@@ -19,20 +22,36 @@ export class Tab7Page {
   // Solicitar permiso para recibir notificaciones
   async initPushNotifications() {
     // Solicitar permiso al usuario
-    const permission = await PushNotifications.requestPermissions();
+    const permission = await LocalNotifications.requestPermissions();
 
-    if (permission.receive === 'granted') {
+    if (permission.display === 'granted') {
       // Registro de la aplicación para recibir notificaciones
-      await PushNotifications.register();
+      let options: ScheduleOptions = {
+        notifications: [
+          {
+            id: 111,
+            title: 'Prueba notificacion',
+            body: 'Esto es una prueba de notificacion',
+            largeBody: 'Notficaciones de pruebas de la aplicacion',
+            summaryText: 'Resumen de la notificacion',
+          },
+        ],
+      };
+
+      try {
+        await LocalNotifications.schedule(options);
+      } catch (error) {
+        alert(JSON.stringify(error));
+      }
     } else {
-      console.error('Permiso para recibir notificaciones no concedido');
+      alert('Permiso para recibir notificaciones no concedido');
     }
 
     // Listener para habilitar el botón cuando llegue la notificación
     LocalNotifications.addListener(
       'localNotificationReceived',
       (notification) => {
-        console.log('Notificación recibida: ', notification);
+        console.log('Notificación recibida: ' + notification);
         this.isButtonDisabled = false;
         this.countdown = null;
       }
@@ -46,19 +65,16 @@ export class Tab7Page {
   }
 
   // Función para programar una notificación
-  scheduleNotification() {
-    const notificationTime = new Date(Date.now() + 2 * 60000); // 2 minutos a partir de ahora
-    console.log(
-      'Notificación programada para: ',
-      notificationTime.toLocaleString()
-    );
+  async scheduleNotification() {
+    const notificationTime = new Date(Date.now() + 20 * 1000); // 20 segundos a partir de ahora
+    alert('Notificación programada para: ' + notificationTime.toLocaleString());
 
-    LocalNotifications.schedule({
+    const options: ScheduleOptions = {
       notifications: [
         {
           title: 'Notificación programada',
           body: 'Esta notificación se envió después de 2 minutos',
-          id: new Date().getTime(),
+          id: Math.floor(Math.random() * 100000),
           schedule: { at: notificationTime },
           sound: 'default', // Especifica el sonido aquí
           attachments: undefined,
@@ -66,10 +82,18 @@ export class Tab7Page {
           extra: null,
         },
       ],
-    });
+    };
+
+    try {
+      await LocalNotifications.schedule(options);
+      alert('Notificación programada con éxito');
+    } catch (error) {
+      console.log('Error al programar la notificación:', error);
+      alert('Error al programar la notificación:' + (error as Error).message);
+    }
 
     // Iniciar el contador
-    this.startCountdown(120); // 120 segundos = 2 minutos
+    this.startCountdown(20); // 120 segundos = 2 minutos
   }
 
   // Función para iniciar el contador
