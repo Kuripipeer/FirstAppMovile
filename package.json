@@ -32,6 +32,7 @@
     "@capacitor/keyboard": "6.0.2",
     "@capacitor/local-notifications": "^6.1.0",
     "@capacitor/network": "^6.0.2",
+    "@capacitor/preferences": "^6.0.2",
     "@capacitor/push-notifications": "^6.0.2",
     "@capacitor/status-bar": "6.0.1",
     "@capgo/capacitor-flash": "^6.0.3",

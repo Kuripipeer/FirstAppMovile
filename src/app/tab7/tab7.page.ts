@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-// import { PushNotifications } from '@capacitor/push-notifications';
 import {
   LocalNotifications,
   ScheduleOptions,
 } from '@capacitor/local-notifications';
+import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-tab7',
@@ -15,180 +15,102 @@ export class Tab7Page {
   countdown: number | null = null;
 
   constructor() {
-    // Inicializar las notificaciones al cargar la aplicación
+    // Cargar el estado al iniciar la aplicación
+    this.loadState();
     this.initPushNotifications();
   }
 
-  // Solicitar permiso para recibir notificaciones
+  async loadState() {
+    const buttonState = await Preferences.get({ key: 'isButtonDisabled' });
+    const endTimeValue = await Preferences.get({ key: 'endTime' });
+
+    this.isButtonDisabled = buttonState.value === 'true';
+
+    if (endTimeValue.value) {
+      const endTime = parseInt(endTimeValue.value, 10);
+      const now = Date.now();
+      const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+
+      if (timeLeft > 0) {
+        this.countdown = timeLeft;
+        this.startCountdown(timeLeft);
+      } else {
+        this.isButtonDisabled = false;
+        this.countdown = null;
+        await Preferences.set({ key: 'isButtonDisabled', value: 'false' });
+        await Preferences.remove({ key: 'endTime' });
+      }
+    }
+  }
+
   async initPushNotifications() {
-    // Solicitar permiso al usuario
     const permission = await LocalNotifications.requestPermissions();
 
     if (permission.display === 'granted') {
-      // Registro de la aplicación para recibir notificaciones
-      let options: ScheduleOptions = {
-        notifications: [
-          {
-            id: 111,
-            title: 'Prueba notificacion',
-            body: 'Esto es una prueba de notificacion',
-            largeBody: 'Notficaciones de pruebas de la aplicacion',
-            summaryText: 'Resumen de la notificacion',
-          },
-        ],
-      };
+      LocalNotifications.addListener(
+        'localNotificationActionPerformed',
+        async (notification) => {
+          console.log('Notificación activada: ', notification);
+          this.isButtonDisabled = false;
+          this.countdown = null;
 
-      try {
-        await LocalNotifications.schedule(options);
-      } catch (error) {
-        alert(JSON.stringify(error));
-      }
-    } else {
-      alert('Permiso para recibir notificaciones no concedido');
+          await Preferences.set({ key: 'isButtonDisabled', value: 'false' });
+          await Preferences.remove({ key: 'endTime' });
+        }
+      );
     }
-
-    // Listener para habilitar el botón cuando llegue la notificación
-    LocalNotifications.addListener(
-      'localNotificationReceived',
-      (notification) => {
-        console.log('Notificación recibida: ' + notification);
-        this.isButtonDisabled = false;
-        this.countdown = null;
-      }
-    );
   }
 
-  // Función para manejar el clic del botón
   handleButtonClick() {
     this.isButtonDisabled = true;
+    Preferences.set({ key: 'isButtonDisabled', value: 'true' });
     this.scheduleNotification();
   }
 
-  // Función para programar una notificación
   async scheduleNotification() {
     const notificationTime = new Date(Date.now() + 20 * 1000); // 20 segundos a partir de ahora
-    alert('Notificación programada para: ' + notificationTime.toLocaleString());
+    // alert('Notificación programada para: ' + notificationTime.toLocaleString());
 
     const options: ScheduleOptions = {
       notifications: [
         {
           title: 'Notificación programada',
-          body: 'Esta notificación se envió después de 2 minutos',
+          body: 'Esta notificación se envió después de 20 segundos',
           id: Math.floor(Math.random() * 100000),
           schedule: { at: notificationTime },
-          sound: 'default', // Especifica el sonido aquí
-          attachments: undefined,
-          actionTypeId: '',
-          extra: null,
+          sound: 'default',
         },
       ],
     };
 
     try {
       await LocalNotifications.schedule(options);
-      alert('Notificación programada con éxito');
+      // alert('Notificación programada con éxito');
     } catch (error) {
       console.log('Error al programar la notificación:', error);
       alert('Error al programar la notificación:' + (error as Error).message);
     }
 
-    // Iniciar el contador
-    this.startCountdown(20); // 120 segundos = 2 minutos
+    // Iniciar el contador y guardar el estado
+    this.startCountdown(20);
   }
 
-  // Función para iniciar el contador
-  startCountdown(seconds: number) {
+  async startCountdown(seconds: number) {
+    const endTime = Date.now() + seconds * 1000;
+    await Preferences.set({ key: 'endTime', value: endTime.toString() });
+
     this.countdown = seconds;
-    const interval = setInterval(() => {
-      if (this.countdown !== null) {
-        this.countdown--;
-      }
-      if (this.countdown !== null && this.countdown <= 0) {
+    const interval = setInterval(async () => {
+      const now = Date.now();
+      const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+      this.countdown = timeLeft;
+
+      if (this.countdown <= 0) {
         clearInterval(interval);
+        this.isButtonDisabled = false;
+        await Preferences.set({ key: 'isButtonDisabled', value: 'false' });
+        await Preferences.remove({ key: 'endTime' });
       }
     }, 1000);
   }
-
-  // // Solicitar permiso al usuario
-  // const permission = await PushNotifications.requestPermissions();
-
-  // if (permission.receive === 'granted') {
-  //   // Registro de la aplicación para recibir notificaciones
-  //   await PushNotifications.register();
-  //   // Configurar el envío de notificaciones cada minuto
-  //   this.scheduleNotifications();
-  // } else {
-  //   console.error('Permios para recibir notificaciones no concedido');
-  // }
-
-  // Función para enviar una notificación
-  // sendNotification() {
-  //   PushNotifications.createChannel({
-  //     id: 'default',
-  //     name: 'Default Channel',
-  //     importance: 5,
-  //     visibility: 1,
-  //     sound: 'default',
-  //   });
-
-  //   PushNotifications.addListener(
-  //     'pushNotificationReceived',
-  //     (notification) => {
-  //       console.log('Notificación recibida: ', notification);
-  //     }
-  //   );
-
-  //   PushNotifications.addListener(
-  //     'pushNotificationActionPerformed',
-  //     (notification) => {
-  //       console.log('Acción de notificación realizada: ', notification);
-  //     }
-  //   );
-  //   LocalNotifications.schedule({
-  //     notifications: [
-  //       {
-  //         title: 'Notificación periódica',
-  //         body: 'Esta es una notificación enviada cada minuto',
-  //         id: new Date().getTime(),
-  //         schedule: { at: new Date(Date.now() + 60000) },
-  //         sound: 'default',
-  //         attachments: undefined,
-  //         actionTypeId: '',
-  //         extra: null,
-  //       },
-  //     ],
-  //   });
-  // }
-
-  // // Configurar el envío de notificaciones cada minuto
-  // scheduleNotifications() {
-  //   setInterval(() => {
-  //     this.sendNotification();
-  //   }, 60000); // 60000 ms = 1 minuto
-  // }
-
-  // Función para simular la notificación en el navegador
-  // showNotification(notification: { title: string; body: string }) {
-  //   const title = notification.title || 'Nueva Notificación';
-  //   const message = notification.body || 'Has recibido una notificación';
-
-  //   // Usar la API  de Notificaciones del navegador
-  //   if ('Notification' in window) {
-  //     if (Notification.permission === 'granted') {
-  //       new Notification(title, {
-  //         body: message,
-  //       });
-  //     } else if (Notification.permission !== 'denied') {
-  //       Notification.requestPermission().then((permission) => {
-  //         if (permission === 'granted') {
-  //           new Notification(title, {
-  //             body: message,
-  //           });
-  //         }
-  //       });
-  //     }
-  //   } else {
-  //     alert(`${title}: ${message}`); // Fallback para navegadores que no soportan la API de Notificaciones
-  //   }
-  // }
 }
